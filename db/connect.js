@@ -19,8 +19,6 @@ mongoose.connect('mongodb://localhost/mydatabase', { useNewUrlParser: true, useU
     console.error('Failed to connect to MongoDB:', err);
 });
 
-const mongoose = require('mongoose');
-
 /*Define a data model: You can define a data model using the mongoose.Schema and mongoose.model methods. 
 A schema defines the structure of your documents, and a model represents a collection in MongoDB based on that schema. 
 Here's an example:*/
