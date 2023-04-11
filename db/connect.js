@@ -19,14 +19,15 @@ mongoose.connect('mongodb://localhost/mydatabase', { useNewUrlParser: true, useU
     console.error('Failed to connect to MongoDB:', err);
 });
 
+
 /*Define a data model: You can define a data model using the mongoose.Schema and mongoose.model methods. 
 A schema defines the structure of your documents, and a model represents a collection in MongoDB based on that schema. 
 Here's an example:*/
 // Define a schema
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    pass: { type: String, required: true },
-    key: { type: String, required: true, unique: true },
+    age: { type: Number, required: true },
+    email: { type: String, required: true, unique: true },
 });
 
 // Create a model from the schema
@@ -37,7 +38,7 @@ Once you have defined a data model, you can use it to perform CRUD operations on
 For example, you can create a new document, retrieve documents, update documents, and delete documents using methods provided by the model. 
 Here are some examples:*/
 // Create a new document
-const newUser = new User({ name: 'John', pass: '123', key: 'idk' });
+const newUser = new User({ name: 'John Doe', age: 30, email: 'johndoe@example.com' });
 newUser.save()
   .then(() => {
     console.log('User created:', newUser);
@@ -47,7 +48,7 @@ newUser.save()
   });
 
 // Retrieve documents
-User.find({ pass: { $gte: 123 } })
+User.find({ age: { $gte: 18 } })
   .then((users) => {
     console.log('Users:', users);
   })
@@ -56,7 +57,7 @@ User.find({ pass: { $gte: 123 } })
   });
 
 // Update documents
-User.findOneAndUpdate({ name: 'John' }, { pass: 123 })
+User.findOneAndUpdate({ name: 'John Doe' }, { age: 31 })
   .then((user) => {
     console.log('User updated:', user);
   })
@@ -65,7 +66,7 @@ User.findOneAndUpdate({ name: 'John' }, { pass: 123 })
   });
 
 // Delete documents
-User.findOneAndDelete({ key: 'idk' })
+User.findOneAndDelete({ email: 'johndoe@example.com' })
   .then((user) => {
     console.log('User deleted:', user);
   })
