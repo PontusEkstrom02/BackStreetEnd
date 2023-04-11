@@ -4,7 +4,9 @@ const mongoose = require('mongoose');
 It provides a higher-level abstraction for interacting with MongoDB in a backend context, making it easier to work with MongoDB collections, documents, and queries using JavaScript.
 
 Mongoose allows you to define data models in your Node.js application, which represent the structure of your documents in MongoDB. 
-You can then use these models to interact with your MongoDB database, perform CRUD (Create, Read, Update, Delete) operations, and handle complex queries and data validation.*/
+You can then use these models to interact with your MongoDB database, perform CRUD (Create, Read, Update, Delete) operations, and handle complex queries and data validation.
+
+Here's a step-by-step overview of how you can use Mongoose in a backend context:*/
 
 /*Connect to MongoDB: You can connect to your MongoDB database using the mongoose.connect() method, 
 passing in the connection string as the first argument:*/
