@@ -1,7 +1,14 @@
 const mongoose = require('mongoose');
 
+/*Sure! Mongoose is a popular Object-Document Mapping (ODM) library for Node.js and MongoDB. 
+It provides a higher-level abstraction for interacting with MongoDB in a backend context, making it easier to work with MongoDB collections, documents, and queries using JavaScript.
+
+Mongoose allows you to define data models in your Node.js application, which represent the structure of your documents in MongoDB. 
+You can then use these models to interact with your MongoDB database, perform CRUD (Create, Read, Update, Delete) operations, and handle complex queries and data validation.*/
+
 /*Connect to MongoDB: You can connect to your MongoDB database using the mongoose.connect() method, 
 passing in the connection string as the first argument:*/
+
 mongoose.connect('mongodb://localhost/mydatabase', { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log('Connected to MongoDB');
