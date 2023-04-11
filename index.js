@@ -4,7 +4,7 @@ import express from 'express';
 import { createServer } from 'http';
 //const { createServer } = require('http');
 
-import SocketService from './src/service/SocketService.js';
+import SocketService from './service/socketService.js';
 
 
 const app = express();
