@@ -25,8 +25,8 @@ Here's an example:*/
 // Define a schema
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    age: { type: Number, required: true },
-    email: { type: String, required: true, unique: true },
+    pass: { type: String, required: true },
+    key: { type: String, required: true, unique: true },
 });
 
 // Create a model from the schema
@@ -37,7 +37,7 @@ Once you have defined a data model, you can use it to perform CRUD operations on
 For example, you can create a new document, retrieve documents, update documents, and delete documents using methods provided by the model. 
 Here are some examples:*/
 // Create a new document
-const newUser = new User({ name: 'John Doe', age: 30, email: 'johndoe@example.com' });
+const newUser = new User({ name: 'John', pass: '123', key: 'idk' });
 newUser.save()
   .then(() => {
     console.log('User created:', newUser);
@@ -47,7 +47,7 @@ newUser.save()
   });
 
 // Retrieve documents
-User.find({ age: { $gte: 18 } })
+User.find({ pass: { $gte: 123 } })
   .then((users) => {
     console.log('Users:', users);
   })
@@ -56,7 +56,7 @@ User.find({ age: { $gte: 18 } })
   });
 
 // Update documents
-User.findOneAndUpdate({ name: 'John Doe' }, { age: 31 })
+User.findOneAndUpdate({ name: 'John' }, { pass: 123 })
   .then((user) => {
     console.log('User updated:', user);
   })
@@ -65,7 +65,7 @@ User.findOneAndUpdate({ name: 'John Doe' }, { age: 31 })
   });
 
 // Delete documents
-User.findOneAndDelete({ email: 'johndoe@example.com' })
+User.findOneAndDelete({ key: 'idk' })
   .then((user) => {
     console.log('User deleted:', user);
   })
