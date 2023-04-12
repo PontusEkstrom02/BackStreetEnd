@@ -31,6 +31,12 @@ function sendToUser(username, message) {
 //client.emit("private", message); // skickar endast till EN klient
 }
 
+function sendChatsToUser(username){
+  // fix username to key
+  const client = clients.find(client => client.username == username);
+  matchedClients.forEach(client => client.emit("private", message));
+}
+
 function broadcast(channel, message) {
   io.emit(channel, message); //broadcastar till alla på socket servern
 }
