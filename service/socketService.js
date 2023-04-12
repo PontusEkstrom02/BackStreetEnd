@@ -1,10 +1,10 @@
-const { Server } = require('socket.io');
+const { Server } = require("socket.io");
 
 const options = {
   cors: {
-    origin: "*"
-  }
-}
+    origin: "*",
+  },
+};
 
 let io = undefined;
 let clients = [];
@@ -22,11 +22,13 @@ function handleNewConnection(clientSocket, channel) {
 
   // 2. Remove the client from the list when the client's connection is disconnected
   clientSocket.on("disconnect", () => {
-    clients = clients.filter(client => client != clientSocket);
+    clients = clients.filter((client) => client != clientSocket);
 
     // Remove the client from the corresponding channel
     if (Channels[channel]) {
-      Channels[channel] = Channels[channel].filter(client => client !== clientSocket);
+      Channels[channel] = Channels[channel].filter(
+        (client) => client !== clientSocket
+      );
     }
   });
 
@@ -41,7 +43,7 @@ function handleNewConnection(clientSocket, channel) {
 // Function to broadcast a message to all clients in a channel
 function broadcast(channel, message) {
   if (Channels[channel]) {
-    Channels[channel].forEach(client => client.emit(channel, message));
+    Channels[channel].forEach((client) => client.emit(channel, message));
   }
 }
 
@@ -51,6 +53,10 @@ function sendToUser(username, message) {
   if (Channels[channel]) {
     const matchedClients = Channels[channel].filter(client => client.username === username);
     matchedClients.forEach(client => client.emit(message));
+    const matchedClients = Channels[channel].filter(
+      (client) => client.username === username
+    );
+    matchedClients.forEach((client) => client.emit(channel, message));
   }
 }
 */
@@ -63,8 +69,8 @@ function attach(container, channel) {
   });
 }
 
-const channel = 'myChannel';
-const message = 'Hello everyone!';
+const channel = "myChannel";
+const message = "Hello everyone!";
 broadcast(channel, message);
 
 module.exports = { broadcast, attach, getAllChannels};
