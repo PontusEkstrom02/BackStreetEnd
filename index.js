@@ -1,19 +1,17 @@
-import express from 'express';
-//const express = require('express');
-
-import { createServer } from 'http';
-//const { createServer } = require('http');
-
-import SocketService from './service/socketService.js';
-
-
+require("dotenv").config();
+const express = require("express");
 const app = express();
-const httpServer = createServer(app);
 
-app.use(express.json());
+//connectDB
+const connectDB = require("./db/connect");
 
+//routers
+const authRouter = require("./routes/auth");
+const chatsRouter = require("./routes/chats");
 
-SocketService.attach(httpServer);
+//middleware
+app.use(express.static("./public")); //gör mappen public till static.
+app.use(express.json()); //säger att vi använder json i express,
 
 /*
 app.post("/broadcast/:msg", (request, response) => {
@@ -43,8 +41,26 @@ app.post("/send/:username", (request, response) => {
   SocketService.sendToUser(username, message);
 
   response.sendStatus(200);
+//testing
+app.get("/home", (req, res) => {
+  res.send("Chatapp!");
 });
 
+//urls
+app.use("/chattapp/auth", authRouter);
+app.use("/chattapp/chats", chatsRouter);
 
+//server
+const port = process.env.PORT || 3000; // Port number to listen on
 
 httpServer.listen(20020, () => console.log("Server started..."));
+const start = async () => {
+  try {
+    await connectDB(process.env.MONGO_URI);
+    app.listen(port, () => console.log(`Det funkar vi lyssnar på ${port}`));
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+start();
