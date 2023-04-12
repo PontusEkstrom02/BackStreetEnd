@@ -45,13 +45,15 @@ function broadcast(channel, message) {
   }
 }
 
+/*
 // Function to send a private message to a specific user in a channel
-function sendToUser(username, channel, message) {
+function sendToUser(username, message) {
   if (Channels[channel]) {
     const matchedClients = Channels[channel].filter(client => client.username === username);
-    matchedClients.forEach(client => client.emit(channel, message));
+    matchedClients.forEach(client => client.emit(message));
   }
 }
+*/
 
 // Function to attach socket.io to a container with a specific channel
 function attach(container, channel) {
@@ -65,4 +67,4 @@ const channel = 'myChannel';
 const message = 'Hello everyone!';
 broadcast(channel, message);
 
-module.exports = { broadcast, attach, sendToUser };
+module.exports = { broadcast, attach, getAllChannels};

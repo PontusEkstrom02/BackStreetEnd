@@ -6,6 +6,8 @@ const { createServer } = require('http');
 const SocketService = require ('./service/socketService.js');
 const app = express();
 
+let UsingServer = 'myChannel'
+
 app.use("/auth", auth);
 //connectDB
 const connectDB = require("./db/connect");
@@ -14,44 +16,36 @@ const connectDB = require("./db/connect");
 const authRouter = require("./routes/auth");
 const chatsRouter = require("./routes/chats");
 
-
 //middleware
 app.use(express.static("./public")); //gör mappen public till static.
 app.use(express.json()); //säger att vi använder json i express,
 
+// 1. [GET] - http://address:port/ducks/api/channel/ <-- hämtar en lista över annonserade kanaler.
+app.get("/ducks/api/channel/", (request, response) => {
+  const channel = request.query.channel; // Extract the channel name from query parameters
+  const channels = SocketService.getAllChannels(channel); // Pass the channel name to getAllChannels()
+  response.sendStatus(200);
+})
+
+// 2.[GET] - http://adress:port/ducks/api/channel/:id <-- 
+//hämtar innehållet i en identiferad kanal som tidigare har annonserats ut, detta syftar på meddelanden som har skickats i kanalen.
+app.get("/ducks/api/channel/:id", (request, response) => {
+
+  response.sendStatus(200);
+});
+
 /*
-app.post("/broadcast/:msg", (request, response) => {
-  SocketService.broadcast("public", request.params.msg)
+test/exemple
+app.post("/send/:username", (request, response) => {
+  const username = request.params.username;
+  const message = request.body.message;
+  //const channel = request.body.channel;
+
+  SocketService.sendToUser(username, message); // Pass channel as parameter to sendToUser function
 
   response.sendStatus(200);
 });
 */
-// 1. [GET] - http://address:port/ducks/api/channel/ <-- hämtar en lista över annonserade kanaler. Se VG kritierier för krav till ett högre betyg.
-app.get("/ducks/api/channel/", (request, response) => {
-  const channels = SocketService.getAllChannels();
-
-  response.status(200).json(channels);
-})
-//[GET] - http://adress:port/ducks/api/channel/:id <-- 
-//hämtar innehållet i en identiferad kanal som tidigare har annonserats ut, detta syftar på meddelanden som har skickats i kanalen.
-app.get("/ducks/api/channel/:id", (request, response) => {
-  const channelId = request.params.id;
-  // Use channelId to fetch messages from the corresponding channel using SocketService
-  // and send the response back
-  // Example: const messages = SocketService.getMessages(channelId);
-  //          response.status(200).json(messages);
-});
-
-app.post("/send/:username", (request, response) => {
-  const username = request.params.username;
-  const message = request.body.message;
-  const channel = request.body.channel; // Add channel parameter to request body
-
-  SocketService.sendToUser(username, channel, message); // Pass channel as parameter to sendToUser function
-
-  response.sendStatus(200);
-});
-
 //testing
 app.get("/home", (req, res) => {
   res.send("Chatapp!");
