@@ -6,50 +6,63 @@ const options = {
   }
 }
 
-
-
 let io = undefined;
 let clients = [];
-let Channels = [];
-/*
-function getAllChannels(){
-  Channels = 
+let Channels = {};
+
+function getAllChannels() {
+  return Object.keys(Channels);
 }
-*/
-function handleNewConnection(clientSocket) {
-  // 1. Sparar client sockets för ex. broadcasts via rest anrop
+
+function handleNewConnection(clientSocket, channel) {
+  // 1. Save client sockets for broadcasts via REST API
   clients.push(clientSocket);
 
   clientSocket.username = clientSocket.handshake.headers.username;
 
-  // 2. Plockar bort klienten från listan när anslutningen för klienten avbryts
+  // 2. Remove the client from the list when the client's connection is disconnected
   clientSocket.on("disconnect", () => {
     clients = clients.filter(client => client != clientSocket);
+
+    // Remove the client from the corresponding channel
+    if (Channels[channel]) {
+      Channels[channel] = Channels[channel].filter(client => client !== clientSocket);
+    }
+  });
+
+  // Add the client to the corresponding channel
+  if (Channels[channel]) {
+    Channels[channel].push(clientSocket);
+  } else {
+    Channels[channel] = [clientSocket];
+  }
+}
+
+// Function to broadcast a message to all clients in a channel
+function broadcast(channel, message) {
+  if (Channels[channel]) {
+    Channels[channel].forEach(client => client.emit(channel, message));
+  }
+}
+
+// Function to send a private message to a specific user in a channel
+function sendToUser(username, channel, message) {
+  if (Channels[channel]) {
+    const matchedClients = Channels[channel].filter(client => client.username === username);
+    matchedClients.forEach(client => client.emit(channel, message));
+  }
+}
+
+// Function to attach socket.io to a container with a specific channel
+function attach(container, channel) {
+  io = new Server(container, options);
+  io.of(channel).on("connection", (clientSocket) => {
+    handleNewConnection(clientSocket, channel);
   });
 }
 
-function sendToUser(username, message) {
-  const matchedClients = clients.filter(client => client.username == username);
-  matchedClients.forEach(client => client.emit("private", message));
-  
-  
-//const client = clients.find(client => client.username == username);
-//client.emit("private", message); // skickar endast till EN klient
-}
+const channel = 'myChannel';
+const message = 'Hello everyone!';
+broadcast(channel, message);
 
-function sendChatsToUser(username){
-  // fix change username to key
-  const client = clients.find(client => client.username == username);
-  client.emit("private", message); // skickar endast till EN klient
-}
-
-function broadcast(channel, message) {
-  io.emit(channel, message); //broadcastar till alla på socket servern
-}
-
-function attach(container) {
-  io = new Server(container, options);
-  io.on("connection", handleNewConnection);
-}
-
-export default { broadcast, attach, sendToUser }
+module.exports = { broadcast, attach, sendToUser };
