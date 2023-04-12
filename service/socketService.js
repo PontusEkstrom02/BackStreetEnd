@@ -1,5 +1,4 @@
-import { Server } from 'socket.io';
-//const { Server } = require('socket.io');
+const { Server } = require('socket.io');
 
 const options = {
   cors: {
@@ -16,12 +15,12 @@ function getAllChannels() {
 }
 
 function handleNewConnection(clientSocket, channel) {
-  // 1. Sparar client sockets för ex. broadcasts via rest anrop
+  // 1. Save client sockets for broadcasts via REST API
   clients.push(clientSocket);
 
   clientSocket.username = clientSocket.handshake.headers.username;
 
-  // 2. Plockar bort klienten från listan när anslutningen för klienten avbryts
+  // 2. Remove the client from the list when the client's connection is disconnected
   clientSocket.on("disconnect", () => {
     clients = clients.filter(client => client != clientSocket);
 
@@ -66,4 +65,4 @@ const channel = 'myChannel';
 const message = 'Hello everyone!';
 broadcast(channel, message);
 
-export default { broadcast, attach, sendToUser }
+module.exports = { broadcast, attach, sendToUser };

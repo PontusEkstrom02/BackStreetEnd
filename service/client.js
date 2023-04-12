@@ -1,10 +1,10 @@
-const bobSocket = io("ws://127.0.0.1:20020", {
+const bobSocket = io("ws://127.0.0.1:3000", {
   extraHeaders: {
     username: "Bob"
   }
 }); //clientSocket
 
-const gretaSocket = io("ws://127.0.0.1:20020", {
+const gretaSocket = io("ws://127.0.0.1:3000", {
   extraHeaders: {
     username: "Greta"
   }

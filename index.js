@@ -9,6 +9,9 @@ const connectDB = require("./db/connect");
 const authRouter = require("./routes/auth");
 const chatsRouter = require("./routes/chats");
 
+//require SocketService
+const SocketService = require("./service/socketService");
+
 //middleware
 app.use(express.static("./public")); //gör mappen public till static.
 app.use(express.json()); //säger att vi använder json i express,
@@ -29,18 +32,23 @@ app.get("/ducks/api/channel/", (request, response) => {
 //[GET] - http://adress:port/ducks/api/channel/:id <-- 
 //hämtar innehållet i en identiferad kanal som tidigare har annonserats ut, detta syftar på meddelanden som har skickats i kanalen.
 app.get("/ducks/api/channel/:id", (request, response) => {
-  const channels = SocketService.getAllChannels();
-
-  response.status(200).json(channels);
-})
+  const channelId = request.params.id;
+  // Use channelId to fetch messages from the corresponding channel using SocketService
+  // and send the response back
+  // Example: const messages = SocketService.getMessages(channelId);
+  //          response.status(200).json(messages);
+});
 
 app.post("/send/:username", (request, response) => {
   const username = request.params.username;
   const message = request.body.message;
+  const channel = request.body.channel; // Add channel parameter to request body
 
-  SocketService.sendToUser(username, message);
+  SocketService.sendToUser(username, channel, message); // Pass channel as parameter to sendToUser function
 
   response.sendStatus(200);
+});
+
 //testing
 app.get("/home", (req, res) => {
   res.send("Chatapp!");
@@ -53,7 +61,6 @@ app.use("/chattapp/chats", chatsRouter);
 //server
 const port = process.env.PORT || 3000; // Port number to listen on
 
-httpServer.listen(20020, () => console.log("Server started..."));
 const start = async () => {
   try {
     await connectDB(process.env.MONGO_URI);
