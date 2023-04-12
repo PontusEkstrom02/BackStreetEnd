@@ -2,11 +2,9 @@
 require("dotenv").config();
 const express = require('express');
 const auth = require("./routes/auth")
-const { createServer } = require('http');
 const SocketService = require ('./service/socketService.js');
 const app = express();
 
-let UsingServer = 'myChannel'
 
 app.use("/auth", auth);
 //connectDB
@@ -22,8 +20,7 @@ app.use(express.json()); //säger att vi använder json i express,
 
 // 1. [GET] - http://address:port/ducks/api/channel/ <-- hämtar en lista över annonserade kanaler.
 app.get("/ducks/api/channel/", (request, response) => {
-  const channel = request.query.channel; // Extract the channel name from query parameters
-  const channels = SocketService.getAllChannels(channel); // Pass the channel name to getAllChannels()
+
   response.sendStatus(200);
 })
 
@@ -47,6 +44,9 @@ app.post("/send/:username", (request, response) => {
 });
 */
 //testing
+app.get("/server", (req, res) => {
+  res.send("Chatapp!");
+});
 app.get("/home", (req, res) => {
   res.send("Chatapp!");
 });

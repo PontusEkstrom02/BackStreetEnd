@@ -1,12 +1,14 @@
 const bobSocket = io("ws://127.0.0.1:3000", {
   extraHeaders: {
-    username: "Bob"
+    username: "Bob",
+    channel: "first"
   }
 }); //clientSocket
 
 const gretaSocket = io("ws://127.0.0.1:3000", {
   extraHeaders: {
-    username: "Greta"
+    username: "Greta",
+    channel: "first"
   }
 }); //clientSocket
 

@@ -8,69 +8,65 @@ const options = {
 
 let io = undefined;
 let clients = [];
-let Channels = {};
+let currentChannel = "default"; // Default channel for new connections
 
-function getAllChannels() {
-  return Object.keys(Channels);
-}
-
-function handleNewConnection(clientSocket, channel) {
+function handleNewConnection(clientSocket) {
   // 1. Save client sockets for broadcasts via REST API
   clients.push(clientSocket);
 
   clientSocket.username = clientSocket.handshake.headers.username;
+  clientSocket.channel = currentChannel; // Assign the current channel to the client
 
   // 2. Remove the client from the list when the client's connection is disconnected
   clientSocket.on("disconnect", () => {
     clients = clients.filter((client) => client != clientSocket);
 
     // Remove the client from the corresponding channel
-    if (Channels[channel]) {
-      Channels[channel] = Channels[channel].filter(
-        (client) => client !== clientSocket
-      );
-    }
+    broadcast(clientSocket.channel, {
+      type: "user_leave",
+      username: clientSocket.username,
+    });
   });
 
-  // Add the client to the corresponding channel
-  if (Channels[channel]) {
-    Channels[channel].push(clientSocket);
-  } else {
-    Channels[channel] = [clientSocket];
-  }
+  // 3. Custom event handler for handling channel changes
+  clientSocket.on("changeChannel", (newChannel) => {
+    handleChangeChannel(clientSocket, newChannel);
+  });
+}
+
+function handleChangeChannel(clientSocket, newChannel) {
+  const oldChannel = clientSocket.channel;
+  clientSocket.channel = newChannel;
+
+  // Broadcast user leave event to old channel
+  broadcast(oldChannel, {
+    type: "user_leave",
+    username: clientSocket.username,
+  });
+
+  // Broadcast user join event to new channel
+  broadcast(newChannel, {
+    type: "user_join",
+    username: clientSocket.username,
+  });
+}
+
+function getChannels() {
+  // You can implement logic to retrieve channels here
+  // For example, return an array of channel names
 }
 
 // Function to broadcast a message to all clients in a channel
 function broadcast(channel, message) {
-  if (Channels[channel]) {
-    Channels[channel].forEach((client) => client.emit(channel, message));
-  }
+  io.emit(channel, message);
 }
-
-/*
-// Function to send a private message to a specific user in a channel
-function sendToUser(username, message) {
-  if (Channels[channel]) {
-    const matchedClients = Channels[channel].filter(client => client.username === username);
-    matchedClients.forEach(client => client.emit(message));
-    const matchedClients = Channels[channel].filter(
-      (client) => client.username === username
-    );
-    matchedClients.forEach((client) => client.emit(channel, message));
-  }
-}
-*/
 
 // Function to attach socket.io to a container with a specific channel
-function attach(container, channel) {
+function attach(container) {
   io = new Server(container, options);
-  io.of(channel).on("connection", (clientSocket) => {
-    handleNewConnection(clientSocket, channel);
+  io.on("connection", (clientSocket) => {
+    handleNewConnection(clientSocket);
   });
 }
 
-const channel = "myChannel";
-const message = "Hello everyone!";
-broadcast(channel, message);
-
-module.exports = { broadcast, attach, getAllChannels};
+module.exports = { broadcast, attach, handleChangeChannel, getChannels };
