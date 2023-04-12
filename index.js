@@ -1,14 +1,9 @@
 
 require("dotenv").config();
-
 const express = require('express');
-
 const auth = require("./routes/auth")
-
 const { createServer } = require('http');
-
 const SocketService = require ('./service/socketService.js');
-
 const app = express();
 
 app.use("/auth", auth);
