@@ -9,7 +9,6 @@ const { createServer } = require('http');
 
 const SocketService = require ('./service/socketService.js');
 
-
 const app = express();
 
 app.use("/auth", auth);
@@ -20,8 +19,6 @@ const connectDB = require("./db/connect");
 const authRouter = require("./routes/auth");
 const chatsRouter = require("./routes/chats");
 
-//require SocketService
-const SocketService = require("./service/socketService");
 
 //middleware
 app.use(express.static("./public")); //gör mappen public till static.
