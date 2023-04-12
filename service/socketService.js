@@ -7,9 +7,16 @@ const options = {
   }
 }
 
+
+
 let io = undefined;
 let clients = [];
-
+let Channels = [];
+/*
+function getAllChannels(){
+  Channels = 
+}
+*/
 function handleNewConnection(clientSocket) {
   // 1. Sparar client sockets för ex. broadcasts via rest anrop
   clients.push(clientSocket);
@@ -32,9 +39,9 @@ function sendToUser(username, message) {
 }
 
 function sendChatsToUser(username){
-  // fix username to key
+  // fix change username to key
   const client = clients.find(client => client.username == username);
-  matchedClients.forEach(client => client.emit("private", message));
+  client.emit("private", message); // skickar endast till EN klient
 }
 
 function broadcast(channel, message) {
