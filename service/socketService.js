@@ -1,72 +1,83 @@
-const { Server } = require("socket.io");
+const http = require("http");
+const express = require("express");
+const socketIO = require("socket.io");
 
-const options = {
-  cors: {
-    origin: "*",
-  },
-};
+// Create express app
+const app = express();
+const server = http.createServer(app);
 
-let io = undefined;
-let clients = [];
-let currentChannel = "default"; // Default channel for new connections
+// Attach Socket.io to the server
+const io = socketIO(server);
 
+// Data structure to store channels and messages
+let channels = {};
+
+// Function to handle new connections
 function handleNewConnection(clientSocket) {
-  // 1. Save client sockets for broadcasts via REST API
-  clients.push(clientSocket);
+  console.log(`Client connected with ID: ${clientSocket.id}`);
 
-  clientSocket.username = clientSocket.handshake.headers.username;
-  clientSocket.channel = currentChannel; // Assign the current channel to the client
+  // Send a welcome message to the connected client
+  clientSocket.emit("message", "Welcome to the chat!");
 
-  // 2. Remove the client from the list when the client's connection is disconnected
+  // Event listener for joinChannel event
+  clientSocket.on("joinChannel", (channelId) => {
+    // Leave the current channel (if any)
+    const currentChannelId = clientSocket.channelId;
+    if (currentChannelId) {
+      clientSocket.leave(currentChannelId);
+    }
+
+    // Join the new channel
+    clientSocket.join(channelId);
+    clientSocket.channelId = channelId;
+    console.log(`Client ${clientSocket.id} joined channel with ID: ${channelId}`);
+  });
+
+  // Event listener for sendMessage event
+  clientSocket.on("sendMessage", (message) => {
+    // Get the current channel ID
+    const channelId = clientSocket.channelId;
+
+    // Send the message to the current channel
+    if (channelId) {
+      sendMessageToChannel(channelId, message);
+    }
+  });
+
+  // Event listener for disconnect event
   clientSocket.on("disconnect", () => {
-    clients = clients.filter((client) => client != clientSocket);
+    console.log(`Client disconnected with ID: ${clientSocket.id}`);
 
-    // Remove the client from the corresponding channel
-    broadcast(clientSocket.channel, {
-      type: "user_leave",
-      username: clientSocket.username,
-    });
-  });
-
-  // 3. Custom event handler for handling channel changes
-  clientSocket.on("changeChannel", (newChannel) => {
-    handleChangeChannel(clientSocket, newChannel);
+    // Leave the current channel (if any)
+    const currentChannelId = clientSocket.channelId;
+    if (currentChannelId) {
+      clientSocket.leave(currentChannelId);
+      //idk
+      handleChannelDeleted(currentChannelId);
+    }
   });
 }
 
-function handleChangeChannel(clientSocket, newChannel) {
-  const oldChannel = clientSocket.channel;
-  clientSocket.channel = newChannel;
+// Function to send a message to a specific channel
+function sendMessageToChannel(channelId, message) {
+  // Check if the channel exists
+  if (channels[channelId]) {
+    // Add the new message to the channel
+    channels[channelId].messages.push(message);
 
-  // Broadcast user leave event to old channel
-  broadcast(oldChannel, {
-    type: "user_leave",
-    username: clientSocket.username,
-  });
-
-  // Broadcast user join event to new channel
-  broadcast(newChannel, {
-    type: "user_join",
-    username: clientSocket.username,
-  });
+    // Emit the new message to all connected clients in the channel
+    io.to(channelId).emit("message", message);
+  }
 }
 
-function getChannels() {
-  // You can implement logic to retrieve channels here
-  // For example, return an array of channel names
+// Function to handle channelDeleted event
+function handleChannelDeleted(channelId) {
+  // Emit the channelDeleted event to all connected clients
+  io.emit("channelDeleted", channelId);
 }
 
-// Function to broadcast a message to all clients in a channel
-function broadcast(channel, message) {
-  io.emit(channel, message);
-}
+// Set up event listener for new connections
+io.on("connection", handleNewConnection);
 
-// Function to attach socket.io to a container with a specific channel
-function attach(container) {
-  io = new Server(container, options);
-  io.on("connection", (clientSocket) => {
-    handleNewConnection(clientSocket);
-  });
-}
 
-module.exports = { broadcast, attach, handleChangeChannel, getChannels };
+module.exports = {handleNewConnection, sendMessageToChannel, handleChannelDeleted, channels, io};

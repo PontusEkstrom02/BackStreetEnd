@@ -1,14 +1,13 @@
+//idk ifall jag använder detta
 const bobSocket = io("ws://127.0.0.1:3000", {
   extraHeaders: {
-    username: "Bob",
-    channel: "first"
+    username: "Bob"
   }
 }); //clientSocket
 
 const gretaSocket = io("ws://127.0.0.1:3000", {
   extraHeaders: {
-    username: "Greta",
-    channel: "first"
+    username: "Greta"
   }
 }); //clientSocket
 
