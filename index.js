@@ -1,18 +1,22 @@
 require("dotenv").config();
-const express = require('express');
-const auth = require("./routes/auth")
-const SocketService = require ('./service/socketService.js');
+const express = require("express");
+const SocketService = require("./service/socketService.js");
+require("express-async-errors");
 const app = express();
 
-app.use("/auth", auth);
 //connectDB
 const connectDB = require("./db/connect");
+const authenticateUser = require("./middleware/authetication");
 
 //routers
 const authRouter = require("./routes/auth");
 const chatsRouter = require("./routes/chats");
 
-//middleware
+//Errorhandler
+const notFoundMiddleware = require("./middleware/not-found");
+const errorHandlerMiddleware = require("./middleware/error-handler");
+
+//Static and json
 app.use(express.static("./public")); //gör mappen public till static.
 app.use(express.json()); //säger att vi använder json i express,
 
@@ -100,30 +104,11 @@ app.delete("/ducks/api/channel/:id", (req, res) => {
 /*[GET] - http://adress:port/ducks/api/broadcast/
 hämtar en lista över alla händelser som har skickats ut, ex. älgvandring, traffikolycker m.m.*/
 
-
-/*
-test/exemple
-app.post("/send/:username", (request, response) => {
-  const username = request.params.username;
-  const message = request.body.message;
-  //const channel = request.body.channel;
-
-  SocketService.sendToUser(username, message); // Pass channel as parameter to sendToUser function
-
-  response.sendStatus(200);
-});
-*/
-//testing
-app.get("/server", (req, res) => {
-  res.send("Chatapp!");
-});
-app.get("/home", (req, res) => {
-  res.send("Chatapp!");
-});
-
 //urls
 app.use("/chattapp/auth", authRouter);
-app.use("/chattapp/chats", chatsRouter);
+app.use("/chattapp/chats", authenticateUser, chatsRouter);
+app.use(notFoundMiddleware);
+app.use(errorHandlerMiddleware);
 
 //server
 const port = process.env.PORT || 3000; // Port number to listen on
