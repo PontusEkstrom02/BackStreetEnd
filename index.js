@@ -10,7 +10,7 @@ const authenticateUser = require("./middleware/authetication");
 
 //routers
 const authRouter = require("./routes/auth");
-const chatsRouter = require("./routes/chats");
+const chatsRouter = require("./routes/channels.js");
 
 //Errorhandler
 const notFoundMiddleware = require("./middleware/not-found");
@@ -105,8 +105,8 @@ app.delete("/ducks/api/channel/:id", (req, res) => {
 hämtar en lista över alla händelser som har skickats ut, ex. älgvandring, traffikolycker m.m.*/
 
 //urls
-app.use("/chattapp/auth", authRouter);
-app.use("/chattapp/chats", authenticateUser, chatsRouter);
+app.use("/ducks/api/auth", authRouter);
+app.use("/ducks/api/chats", authenticateUser, chatsRouter);
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 
