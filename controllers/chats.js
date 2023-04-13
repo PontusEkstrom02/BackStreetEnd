@@ -2,7 +2,7 @@
 const CreateChat = async (req, res) => {
   // const task = await Chat.create(req.body);
   // res.status(200).json({ chat });
-  res.send("create chat");
+  res.json(req.user);
 };
 
 //Hämta alla chattar

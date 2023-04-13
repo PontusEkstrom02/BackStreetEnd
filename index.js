@@ -1,21 +1,23 @@
-
 require("dotenv").config();
-const express = require('express');
-const auth = require("./routes/auth")
-const { createServer } = require('http');
-const SocketService = require ('./service/socketService.js');
+require("express-async-errors");
+const express = require("express");
 const app = express();
+const auth = require("./routes/auth");
+const SocketService = require("./service/socketService.js");
 
-app.use("/auth", auth);
 //connectDB
 const connectDB = require("./db/connect");
+const authenticateUser = require("./middleware/authetication");
 
 //routers
 const authRouter = require("./routes/auth");
 const chatsRouter = require("./routes/chats");
 
+//Errorhandler
+const notFoundMiddleware = require("./middleware/not-found");
+const errorHandlerMiddleware = require("./middleware/error-handler");
 
-//middleware
+//Static and json
 app.use(express.static("./public")); //gör mappen public till static.
 app.use(express.json()); //säger att vi använder json i express,
 
@@ -31,8 +33,8 @@ app.get("/ducks/api/channel/", (request, response) => {
   const channels = SocketService.getAllChannels();
 
   response.status(200).json(channels);
-})
-//[GET] - http://adress:port/ducks/api/channel/:id <-- 
+});
+//[GET] - http://adress:port/ducks/api/channel/:id <--
 //hämtar innehållet i en identiferad kanal som tidigare har annonserats ut, detta syftar på meddelanden som har skickats i kanalen.
 app.get("/ducks/api/channel/:id", (request, response) => {
   const channelId = request.params.id;
@@ -52,14 +54,12 @@ app.post("/send/:username", (request, response) => {
   response.sendStatus(200);
 });
 
-//testing
-app.get("/home", (req, res) => {
-  res.send("Chatapp!");
-});
-
-//urls
+//routes
 app.use("/chattapp/auth", authRouter);
-app.use("/chattapp/chats", chatsRouter);
+app.use("/chattapp/chats", authenticateUser, chatsRouter);
+app.use(notFoundMiddleware);
+app.use(errorHandlerMiddleware);
+app.use("/auth", auth);
 
 //server
 const port = process.env.PORT || 3000; // Port number to listen on
