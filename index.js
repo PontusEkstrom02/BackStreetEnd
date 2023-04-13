@@ -3,7 +3,6 @@ const express = require('express');
 const auth = require("./routes/auth")
 const SocketService = require ('./service/socketService.js');
 const app = express();
-let ChannelIdValue = 0;
 
 app.use("/auth", auth);
 //connectDB
