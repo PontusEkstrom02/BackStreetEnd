@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
-//Detta är bara ett exempel, egentligen en task från vår Task upg.
-const ChatSchema = new mongoose.Schema({
+const ChannelSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, "must provide name"],
@@ -10,4 +9,4 @@ const ChatSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Chat", ChatSchema);
+module.exports = mongoose.model("Channel", ChannelSchema);
