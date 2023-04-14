@@ -6,11 +6,12 @@ const { BadRequestError, NotFoundError } = require("../errors");
 /*1. [GET] - http://address:port/ducks/api/channel/
      hämtar en lista över annonserade kanaler.*/
 const GetAllChannels = async (req, res) => {
+  /*
   const channels = await Channel.find({}).sort("CreatedAt");
   res.status(StatusCodes.OK).json({ channels });
-
-  // const channelList = Object.keys(SocketService.channels);
-  // res.json({ channels: channelList });
+*/
+   const channelList = Object.keys(SocketService.channels);
+   res.json({ channels: channelList });
 };
 
 /*2.[GET] - http://adress:port/ducks/api/channel/:id
@@ -33,18 +34,19 @@ const GetAllMessages = async (req, res) => {
   skapar en ny kanal. Tema (rubrik) på kanalen ska skickas som en del http-body:n, 
   förslagvis som del av ett json objekt.*/
 const CreateChannel = async (req, res) => {
+  /*
   req.body.createdBy = req.user.userId;
   const channel = await Channel.create(req.body);
   res.status(StatusCodes.CREATED).json({ channel });
+*/
+   // Generate a new channel ID
+   let channelId = req.body.name;
 
-  // // Generate a new channel ID
-  // let channelId = req.body.name;
-
-  // // Create a new channel object with an empty array for messages
-  // SocketService.channels[channelId] = { messages: [] };
+   // Create a new channel object with an empty array for messages
+   SocketService.channels[channelId] = { messages: [] };
 
   // // Return the channel ID as the response
-  // res.json({ channelId: channelId });
+   res.json({ channelId: channelId });
 };
 
 /*4.[POST] - http://adress:port/ducks/api/channel/:id
@@ -52,16 +54,13 @@ const CreateChannel = async (req, res) => {
   Innehållet i ett meddlande bör vara minst anvsändare och innehåll.*/
 const PostInChannel = async (req, res) => {
   const channelId = req.params.id;
-  const { username, content } = req.body; // assuming the request body contains user and content for the message
-
+  const { username, content } = req.body; 
+  
   // Check if the channel exists
   if (SocketService.channels[channelId]) {
     // Add the new message to the channel
     const newMessage = { username, content };
     SocketService.channels[channelId].messages.push(newMessage);
-
-    // Emit the new message to all connected clients in the channel
-    SocketService.io.to(channelId).emit("message", newMessage);
 
     res.sendStatus(200);
   } else {
@@ -74,14 +73,10 @@ const PostInChannel = async (req, res) => {
 tar bort en identiferad kanal som tidigare annonserats ut.*/
 const DeleteChannel = async (req, res) => {
   const channelId = req.params.id;
-
   // Check if the channel exists
   if (SocketService.channels[channelId]) {
     // Delete the channel
     delete SocketService.channels[channelId];
-
-    // Emit a channelDeleted event to all connected clients
-    SocketService.io.emit("channelDeleted", channelId);
 
     res.sendStatus(200);
   } else {
