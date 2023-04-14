@@ -12,26 +12,24 @@ const io = socketIO(server);
 // Data structure to store channels and messages
 let channels = {};
 
+// Create broadcast
+channels["broadcast"] = { messages: [] };
 // Function to handle new connections
 function handleNewConnection(clientSocket) {
-  console.log(`Client connected with ID: ${clientSocket.id}`);
 
   // Send a welcome message to the connected client
   clientSocket.emit("message", "Welcome to the chat!");
 
-  // Event listener for joinChannel event
-  clientSocket.on("joinChannel", (channelId) => {
-    // Leave the current channel (if any)
-    const currentChannelId = clientSocket.channelId;
-    if (currentChannelId) {
-      clientSocket.leave(currentChannelId);
-    }
+  // Generate a unique channel ID
+  const channelId = "broadcast";
 
-    // Join the new channel
-    clientSocket.join(channelId);
-    clientSocket.channelId = channelId;
-    console.log(`Client ${clientSocket.id} joined channel with ID: ${channelId}`);
-  });
+  // Join the new channel
+  clientSocket.join(channelId);
+  clientSocket.channelId = channelId;
+  console.log(`Client ${clientSocket.id} joined channel with ID: ${channelId}`);
+  
+  // Send the channel ID to the client
+  clientSocket.emit("channelId", channelId); // You can create a custom event "channelId" to send the channel ID to the client
 
   // Event listener for sendMessage event
   clientSocket.on("sendMessage", (message) => {
