@@ -1,4 +1,3 @@
-const SocketService = require("../service/socketService.js");
 const Channel = require("../models/Channel.js");
 const { StatusCodes } = require("http-status-codes");
 const { BadRequestError, NotFoundError } = require("../errors");
@@ -31,11 +30,11 @@ const CreateChannel = async (req, res) => {
   res.status(StatusCodes.CREATED).json({ channel });
 };
 
-const PostInChannel = async (req, res) => {
-  /* skickar ut ett nytt meddelanden till en identiferad kanal som tidigare har annonserats ut. 
-  Innehållet i ett meddlande bör vara minst anvsändare och innehåll. */
-  res.send("Testar att denna väg fungerar, ser du detta funkar det HURRA!");
-};
+// const PostInChannel = async (req, res) => {
+//   /* skickar ut ett nytt meddelanden till en identiferad kanal som tidigare har annonserats ut.
+//   Innehållet i ett meddlande bör vara minst anvsändare och innehåll. */
+//   res.send("Testar att denna väg fungerar, ser du detta funkar det HURRA!");
+// };
 
 const DeleteChannel = async (req, res) => {
   const {
@@ -52,7 +51,7 @@ const DeleteChannel = async (req, res) => {
 module.exports = {
   CreateChannel,
   GetAllChannels,
-  PostInChannel,
+  // PostInChannel,
   DeleteChannel,
   GetThisChannel,
 };
