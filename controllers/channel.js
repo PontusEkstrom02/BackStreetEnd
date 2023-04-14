@@ -3,86 +3,50 @@ const Channel = require("../models/Channel.js");
 const { StatusCodes } = require("http-status-codes");
 const { BadRequestError, NotFoundError } = require("../errors");
 
-/*1. [GET] - http://address:port/ducks/api/channel/
-     hämtar en lista över annonserade kanaler.*/
 const GetAllChannels = async (req, res) => {
-  /*
   const channels = await Channel.find({}).sort("CreatedAt");
   res.status(StatusCodes.OK).json({ channels });
-*/
-   const channelList = Object.keys(SocketService.channels);
-   res.json({ channels: channelList });
 };
 
-/*2.[GET] - http://adress:port/ducks/api/channel/:id
-  hämtar innehållet i en identiferad kanal som tidigare har annonserats ut, 
-  detta syftar på meddelanden som har skickats i kanalen.*/
-const GetAllMessages = async (req, res) => {
-  let channelId = req.params.id;
-  // Check if the channel exists
-  if (SocketService.channels[channelId]) {
-    // Return the messages in the channel
-    let messages = SocketService.channels[channelId].messages;
-    res.json({ messages: messages });
-  } else {
-    // Channel not found
-    res.status(404).json({ error: "Channel not found" });
+//I meddelande-modellen skickar jag in meddelanden till kanalen, inte där än
+const GetThisChannel = async (req, res) => {
+  const {
+    params: { id: channelId },
+  } = req;
+
+  const channel = await Channel.findOne({
+    _id: channelId,
+  });
+
+  if (!channel) {
+    throw new NotFoundError(`No channel with that id: ${channelId}`);
   }
+
+  res.status(StatusCodes.OK).json({ channel });
 };
 
-/*3. [PUT] - http://address:port/ducks/api/channel/
-  skapar en ny kanal. Tema (rubrik) på kanalen ska skickas som en del http-body:n, 
-  förslagvis som del av ett json objekt.*/
 const CreateChannel = async (req, res) => {
-  /*
   req.body.createdBy = req.user.userId;
   const channel = await Channel.create(req.body);
   res.status(StatusCodes.CREATED).json({ channel });
-*/
-   // Generate a new channel ID
-   let channelId = req.body.name;
-
-   // Create a new channel object with an empty array for messages
-   SocketService.channels[channelId] = { messages: [] };
-
-  // // Return the channel ID as the response
-   res.json({ channelId: channelId });
 };
 
-/*4.[POST] - http://adress:port/ducks/api/channel/:id
-  skickar ut ett nytt meddelanden till en identiferad kanal som tidigare har annonserats ut. 
-  Innehållet i ett meddlande bör vara minst anvsändare och innehåll.*/
 const PostInChannel = async (req, res) => {
-  const channelId = req.params.id;
-  const { username, content } = req.body; 
-  
-  // Check if the channel exists
-  if (SocketService.channels[channelId]) {
-    // Add the new message to the channel
-    const newMessage = { username, content };
-    SocketService.channels[channelId].messages.push(newMessage);
-
-    res.sendStatus(200);
-  } else {
-    // Channel not found
-    res.status(404).json({ error: "Channel not found" });
-  }
+  /* skickar ut ett nytt meddelanden till en identiferad kanal som tidigare har annonserats ut. 
+  Innehållet i ett meddlande bör vara minst anvsändare och innehåll. */
+  res.send("Testar att denna väg fungerar, ser du detta funkar det HURRA!");
 };
 
-/*5.[DELETE] - http://adress:port/ducks/api/channel/:id
-tar bort en identiferad kanal som tidigare annonserats ut.*/
 const DeleteChannel = async (req, res) => {
-  const channelId = req.params.id;
-  // Check if the channel exists
-  if (SocketService.channels[channelId]) {
-    // Delete the channel
-    delete SocketService.channels[channelId];
+  const {
+    params: { id: channelId },
+  } = req;
+  const channel = await Channel.findByIdAndRemove({ _id: channelId });
 
-    res.sendStatus(200);
-  } else {
-    // Channel not found
-    res.status(404).json({ error: "Channel not found" });
+  if (!channel) {
+    throw new NotFoundError(`No channel with that id: ${channelId}`);
   }
+  res.status(StatusCodes.OK).send();
 };
 
 module.exports = {
@@ -90,5 +54,5 @@ module.exports = {
   GetAllChannels,
   PostInChannel,
   DeleteChannel,
-  GetAllMessages,
+  GetThisChannel,
 };
