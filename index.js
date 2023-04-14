@@ -138,10 +138,9 @@ app.post("/ducks/api/broadcast/", (req, res) => {
   }
 });
 
-
 //urls
 app.use("/ducks/api/auth", authRouter);
-app.use("/ducks/api/chats", authenticateUser, chatsRouter);
+app.use("/ducks/api/channel", authenticateUser, chatsRouter);
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 

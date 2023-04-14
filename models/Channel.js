@@ -15,10 +15,10 @@ const ChannelSchema = new mongoose.Schema(
       },
     ],
     //Vi kan använda denna för att visa chanells med nyast meddelandena först/högt upp
-    latestMessage: {
-      type: mongoose.Types.ObjectId,
-      ref: "Message",
-    },
+    // latestMessage: {
+    //   type: mongoose.Types.ObjectId,
+    //   ref: "Message",
+    // },
     createdBy: {
       type: mongoose.Types.ObjectId,
       ref: "User",
