@@ -40,6 +40,7 @@ const DeleteChannel = async (req, res) => {
   const {
     params: { id: channelId },
   } = req;
+  
   const channel = await Channel.findByIdAndRemove({ _id: channelId });
 
   if (!channel) {
