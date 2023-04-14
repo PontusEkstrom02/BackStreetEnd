@@ -1,10 +1,9 @@
-const SocketService = require("./service/socketService.js");
-const messageForm = document.getElementById('send-contaier')
-const messageInput = document.getElementById('message-input')
+//const SocketService = require("./service/socketService.js");
 
-SocketService.on('chat-message', data => {
-    console.log(data)
-})
+function test() {
+    let response = fetch('http://127.0.0.1:3000/ducks/api/channel');
+    console.log(response);
+};
 /*
 messageForm.addEventListener('submit', e => {
     e.preventDefault()
