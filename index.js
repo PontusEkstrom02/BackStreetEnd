@@ -1,33 +1,44 @@
-import express from 'express';
-//const express = require('express');
-
-import { createServer } from 'http';
-//const { createServer } = require('http');
-
-import SocketService from './service/socketService.js';
-
-
+require("dotenv").config();
+const express = require("express");
+require("express-async-errors");
 const app = express();
-const httpServer = createServer(app);
 
-app.use(express.json());
+//connectDB
+const connectDB = require("./db/connect");
+const authenticateUser = require("./middleware/authetication");
 
+//routers
+const authRouter = require("./routes/auth");
+const channelsRouter = require("./routes/channels.js");
+const messageRouter = require("./routes/message.js");
+const broadcastRouter = require("./routes/broadcast.js");
 
-SocketService.attach(httpServer);
+//Errorhandler
+const notFoundMiddleware = require("./middleware/not-found");
+const errorHandlerMiddleware = require("./middleware/error-handler");
 
-app.post("/broadcast/:msg", (request, response) => {
-  SocketService.broadcast("public", request.params.msg)
+//Static and json
+app.use(express.static("./public")); //gör mappen public till static.
+app.use(express.json()); //säger att vi använder json i express,
 
-  response.sendStatus(200);
-});
+//urls
+app.use("/ducks/api/auth", authRouter);
+app.use("/ducks/api/channel", authenticateUser, channelsRouter);
+app.use("/ducks/api/channel", authenticateUser, messageRouter);
+app.use("/ducks/api/broadcast", authenticateUser, broadcastRouter);
+app.use(notFoundMiddleware);
+app.use(errorHandlerMiddleware);
 
-app.post("/send/:username", (request, response) => {
-  const username = request.params.username;
-  const message = request.body.message;
+//server
+const port = process.env.PORT || 3000; // Port number to listen on
 
-  SocketService.sendToUser(username, message);
+const start = async () => {
+  try {
+    await connectDB(process.env.MONGO_URI);
+    app.listen(port, () => console.log(`Det funkar vi lyssnar på ${port}`));
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-  response.sendStatus(200);
-});
-
-httpServer.listen(20020, () => console.log("Server started..."));
+start();
