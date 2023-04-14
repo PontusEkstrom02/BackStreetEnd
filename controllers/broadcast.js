@@ -3,16 +3,18 @@ const SocketService = require("../service/socketService.js");
 /*6.[GET] - http://adress:port/ducks/api/broadcast/
 hämtar en lista över alla händelser som har skickats ut, ex. älgvandring, traffikolycker m.m.*/
 const GetBroadcast = async (req, res) => {
-  let channelId = "broadcast";
 
-  // Check if the channel exists
-  if (SocketService.channels[channelId]) {
-    // Return the messages in the channel
-    let messages = SocketService.channels[channelId].messages;
-    res.json({ messages: messages });
-  } else {
-    res.status(404).json({ error: "Channel not found" });
+  const channel = await Channel.findOne({
+    _id: "broadcast",
+  });
+
+  if (!channel) {
+    req.body.createdBy = "ADMIN";
+    const channel = await Channel.create(req.body);
+    res.status(StatusCodes.CREATED).json({ channel });
   }
+
+  res.status(StatusCodes.OK).json({ channel });
 };
 
 /*7. [POST] - http://adress:port/ducks/api/broadcast/
