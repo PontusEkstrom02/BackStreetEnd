@@ -20,7 +20,7 @@ const ChannelSchema = new mongoose.Schema(
     //   ref: "Message",
     // },
     createdBy: {
-      type: mongoose.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       require: [true, "pls provide user"], //Tror inte vi behöver denna rad
     },

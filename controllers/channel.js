@@ -1,10 +1,16 @@
 const SocketService = require("../service/socketService.js");
+const Channel = require("../models/Channel.js");
+const { StatusCodes } = require("http-status-codes");
+const { BadRequestError, NotFoundError } = require("../errors");
 
 /*1. [GET] - http://address:port/ducks/api/channel/
      hämtar en lista över annonserade kanaler.*/
 const GetAllChannels = async (req, res) => {
-  const channelList = Object.keys(SocketService.channels);
-  res.json({ channels: channelList });
+  const channels = await Channel.find({}).sort("CreatedAt");
+  res.status(StatusCodes.OK).json({ channels });
+
+  // const channelList = Object.keys(SocketService.channels);
+  // res.json({ channels: channelList });
 };
 
 /*2.[GET] - http://adress:port/ducks/api/channel/:id
@@ -27,14 +33,18 @@ const GetAllMessages = async (req, res) => {
   skapar en ny kanal. Tema (rubrik) på kanalen ska skickas som en del http-body:n, 
   förslagvis som del av ett json objekt.*/
 const CreateChannel = async (req, res) => {
-  // Generate a new channel ID
-  let channelId = req.body.name;
+  req.body.createdBy = req.user.userId;
+  const channel = await Channel.create(req.body);
+  res.status(StatusCodes.CREATED).json({ channel });
 
-  // Create a new channel object with an empty array for messages
-  SocketService.channels[channelId] = { messages: [] };
+  // // Generate a new channel ID
+  // let channelId = req.body.name;
 
-  // Return the channel ID as the response
-  res.json({ channelId: channelId });
+  // // Create a new channel object with an empty array for messages
+  // SocketService.channels[channelId] = { messages: [] };
+
+  // // Return the channel ID as the response
+  // res.json({ channelId: channelId });
 };
 
 /*4.[POST] - http://adress:port/ducks/api/channel/:id

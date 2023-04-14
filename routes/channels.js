@@ -9,7 +9,11 @@ const {
   DeleteChannel,
 } = require("../controllers/channel");
 
-router.route("/").put(CreateChannel).get(GetAllChannels);
-router.route("/:id").post(PostInChannel).delete(DeleteChannel).get(GetAllMessages);
+router.route("/").post(CreateChannel).get(GetAllChannels);
+router
+  .route("/:id")
+  .post(PostInChannel)
+  .delete(DeleteChannel)
+  .get(GetAllMessages);
 
 module.exports = router;
