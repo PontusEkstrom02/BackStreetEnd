@@ -24,12 +24,19 @@ const UserSchema = new mongoose.Schema(
       required: [true, "Please provide password"],
       minlength: 6,
     },
+    role: {
+      type: String,
+      required: [true],
+      default: "USER",
+    },
+    /*
     picture: {
       type: String,
       required: true,
       default:
         "https://icons.iconarchive.com/icons/thesquid.ink/free-flat-sample/512/rubber-duck-icon.png",
     },
+    */
   },
   { timestamps: true }
 );
