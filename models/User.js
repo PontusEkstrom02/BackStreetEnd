@@ -30,6 +30,11 @@ const UserSchema = new mongoose.Schema(
       default:
         "https://icons.iconarchive.com/icons/thesquid.ink/free-flat-sample/512/rubber-duck-icon.png",
     },
+    isAdmin: {
+      type: Boolean,
+      required: [true, "Please provide adminrole, true or false"],
+      default: false,
+    },
   },
   { timestamps: true }
 );
@@ -41,7 +46,7 @@ UserSchema.pre("save", async function () {
 
 UserSchema.methods.createJWT = function () {
   return jwt.sign(
-    { userId: this._id, name: this.name },
+    { userId: this._id, name: this.name, isAdmin: this.isAdmin },
     process.env.JWT_SECRET,
     {
       expiresIn: process.env.JWT_LIFETIME,
