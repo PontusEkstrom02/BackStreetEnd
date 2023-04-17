@@ -1,7 +1,6 @@
 const Message = require("../models/Message.js");
 const { StatusCodes } = require("http-status-codes");
 const { BadRequestError, NotFoundError } = require("../errors");
-//643d4fde35c69db1508a18ae
 
 const GetBroadcast = async (req, res) => {
   const broadcastId = "643d4fde35c69db1508a18ae";

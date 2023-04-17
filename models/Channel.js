@@ -8,18 +8,6 @@ const ChannelSchema = new mongoose.Schema(
       trim: true,
       maxlength: [50, "Pls provide a shorter name for the chat"],
     },
-    // users: [
-    //   {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "User",
-    //   },
-    // ],
-    // messages: [
-    //   {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "Message",
-    //   },
-    // ],
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

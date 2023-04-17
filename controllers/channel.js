@@ -45,7 +45,5 @@ const DeleteChannel = async (req, res) => {
 module.exports = {
   CreateChannel,
   GetAllChannels,
-  // PostInChannel,
   DeleteChannel,
-  // GetThisChannel,
 };
