@@ -10,21 +10,23 @@ const ChannelSchema = new mongoose.Schema(
     },
     users: [
       {
-        type: mongoose.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "User",
       },
     ],
-    latestMessage: {
-      type: mongoose.Types.ObjectId,
-      ref: "Message",
-    },
+    messages: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Message",
+      },
+    ],
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      require: [true, "pls provide user"], //Tror inte vi behöver denna rad
     },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Channel", ChannelSchema);
+const Channel = mongoose.model("Channel", ChannelSchema);
+module.exports = Channel;
