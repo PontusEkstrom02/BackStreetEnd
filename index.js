@@ -5,6 +5,8 @@ const app = express();
 
 //connectDB
 const connectDB = require("./db/connect");
+
+//Authetication
 const authenticateUser = require("./middleware/authetication");
 
 //routers
