@@ -1,6 +1,16 @@
 const Channel = require("../models/Channel.js");
 const { StatusCodes } = require("http-status-codes");
 const { BadRequestError, NotFoundError } = require("../errors");
+const express = require('express');
+const { createServer } = require('http');
+const SocketService = require('../service/socketService.js');
+
+const app = express();
+const httpServer = createServer(app);
+
+app.use(express.json());
+
+SocketService.attach(httpServer);
 
 const GetAllChannels = async (req, res) => {
   const channels = await Channel.find({}).sort("CreatedAt");
@@ -30,11 +40,21 @@ const CreateChannel = async (req, res) => {
   res.status(StatusCodes.CREATED).json({ channel });
 };
 
-// const PostInChannel = async (req, res) => {
-//   /* skickar ut ett nytt meddelanden till en identiferad kanal som tidigare har annonserats ut.
-//   Innehållet i ett meddlande bör vara minst anvsändare och innehåll. */
-//   res.send("Testar att denna väg fungerar, ser du detta funkar det HURRA!");
-// };
+ const PostInChannel = async (req, res) => {
+    const {
+      params: { id: channelId },
+    } = req;
+
+    const channel = await Channel.findOne({
+      _id: channelId,
+    });
+
+    if (!channel) {
+      throw new NotFoundError(`No channel with that id: ${channelId}`);
+    }
+
+    SocketService.broadcast("public", "request.params.msg")
+ };
 
 const DeleteChannel = async (req, res) => {
   const {
@@ -52,7 +72,7 @@ const DeleteChannel = async (req, res) => {
 module.exports = {
   CreateChannel,
   GetAllChannels,
-  // PostInChannel,
+  PostInChannel,
   DeleteChannel,
   GetThisChannel,
 };

@@ -5,14 +5,14 @@ const {
   CreateChannel,
   GetAllChannels,
   GetThisChannel,
-  // PostInChannel,
+  PostInChannel,
   DeleteChannel,
 } = require("../controllers/channel");
 
 router.route("/").put(CreateChannel).get(GetAllChannels);
 router
   .route("/:id")
-  // .post(PostInChannel)
+  .post(PostInChannel)
   .delete(DeleteChannel)
   .get(GetThisChannel);
 

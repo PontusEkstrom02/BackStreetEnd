@@ -1,26 +1,46 @@
-const http = require("http");
-const express = require("express");
-const socketIO = require("socket.io");
+const { Server } = require('socket.io');
 
-// Create express app
-const app = express();
-const server = http.createServer(app);
-
-// Attach Socket.io to the server
-const io = socketIO(server);
-
-// Data structure to store channels and messages
-let channels = {};
-
-// Create broadcast
-channels["broadcast"] = { messages: [] };
-// Function to send a message to a specific channel
-function sendMessageToChannel(channelId, message) {
-  // Check if the channel exists
-  if (channels[channelId]) {
-    // Add the new message to the channel
-    channels[channelId].messages.push(message);
+const options = {
+  cors: {
+    origin: "*"
   }
 }
 
-module.exports = {sendMessageToChannel, channels, io};
+let io = undefined;
+let clients = [];
+
+function handleNewConnection(clientSocket) {
+  // 1. Sparar client sockets för ex. broadcasts via rest anrop
+  clients.push(clientSocket);
+
+  clientSocket.username = clientSocket.handshake.headers.username;
+
+  // 2. Plockar bort klienten från listan när anslutningen för klienten avbryts
+  clientSocket.on("disconnect", () => {
+    clients = clients.filter(client => client != clientSocket);
+  });
+}
+
+function sendToUser(username, message) {
+  const matchedClients = clients.filter(client => client.username == username);
+  matchedClients.forEach(client => client.emit("private", message));
+  
+  
+//const client = clients.find(client => client.username == username);
+//client.emit("private", message); // skickar endast till EN klient
+}
+
+function broadcast(channel, message) {
+  io.emit(channel, message); //broadcastar till alla på socket servern
+}
+
+function attach(container) {
+  io = new Server(container, options);
+  io.on("connection", handleNewConnection);
+}
+
+module.exports = {
+  broadcast,
+  attach,
+  sendToUser,
+};
