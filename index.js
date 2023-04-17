@@ -25,7 +25,7 @@ app.use(express.json()); //säger att vi använder json i express,
 //urls
 app.use("/ducks/api/auth", authRouter);
 app.use("/ducks/api/channel", authenticateUser, channelsRouter);
-app.use("/ducks/api/", authenticateUser, messageRouter);
+app.use("/ducks/api", authenticateUser, messageRouter);
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 

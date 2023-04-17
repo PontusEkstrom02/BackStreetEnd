@@ -80,7 +80,7 @@ const createMessageInBroadcast = async (req, res) => {
       throw new Error(error.message);
     }
   }else{
-    res.status(400);
+    res.send("u no admin");
   }
   
 };
