@@ -24,11 +24,16 @@ const UserSchema = new mongoose.Schema(
       required: [true, "Please provide password"],
       minlength: 6,
     },
-    picture: {
-      type: String,
-      required: true,
-      default:
-        "https://icons.iconarchive.com/icons/thesquid.ink/free-flat-sample/512/rubber-duck-icon.png",
+    // picture: {
+    //   type: String,
+    //   required: true,
+    //   default:
+    //     "https://icons.iconarchive.com/icons/thesquid.ink/free-flat-sample/512/rubber-duck-icon.png",
+    // },
+    isAdmin: {
+      type: Boolean,
+      required: [true, "Please provide adminrole, true or false"],
+      default: false,
     },
   },
   { timestamps: true }
@@ -41,7 +46,7 @@ UserSchema.pre("save", async function () {
 
 UserSchema.methods.createJWT = function () {
   return jwt.sign(
-    { userId: this._id, name: this.name },
+    { userId: this._id, name: this.name, isAdmin: this.isAdmin },
     process.env.JWT_SECRET,
     {
       expiresIn: process.env.JWT_LIFETIME,
@@ -57,4 +62,6 @@ UserSchema.methods.comparePassword = async function (incomingPassword) {
   return comparedPasswords;
 };
 
-module.exports = mongoose.model("User", UserSchema);
+const User = mongoose.model("User", UserSchema);
+
+module.exports = User;

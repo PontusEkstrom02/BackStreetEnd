@@ -1,44 +1,49 @@
-const SocketService = require("../service/socketService.js");
+const Message = require("../models/Message.js");
+const { StatusCodes } = require("http-status-codes");
+const { BadRequestError, NotFoundError } = require("../errors");
+//643d4fde35c69db1508a18ae
 
-/*6.[GET] - http://adress:port/ducks/api/broadcast/
-hämtar en lista över alla händelser som har skickats ut, ex. älgvandring, traffikolycker m.m.*/
 const GetBroadcast = async (req, res) => {
-
-  const channel = await Channel.findOne({
-    _id: "broadcast",
-  });
-
-  if (!channel) {
-    req.body.createdBy = "ADMIN";
-    const channel = await Channel.create(req.body);
-    res.status(StatusCodes.CREATED).json({ channel });
-  }
-
-  res.status(StatusCodes.OK).json({ channel });
+  const broadcastId = "643d4fde35c69db1508a18ae";
+  const broadcastMessages = await Message.find({ channel: broadcastId })
+    .populate("sendedBy", "name")
+    .populate("channel", "channelName");
+  res.status(StatusCodes.OK).json({ broadcastMessages });
 };
 
-/*7. [POST] - http://adress:port/ducks/api/broadcast/
-skapar en ny nödhändelse. Detta anrop ska kräva ett giltigt JWT token.*/
 const CreateBroadcastPost = async (req, res) => {
-  const channelId = "broadcast";
-  const { username, content } = req.body; // assuming the request body contains user and content for the message
-  // Check if the channel exists
-  if (SocketService.channels[channelId]) {
-    // Add the new message to the channel
-    const newMessage = { username, content };
-    SocketService.channels[channelId].messages.push(newMessage);
-    // Emit the new message to all connected clients in the channel
-    SocketService.io.to(channelId).emit("message", newMessage);
-    res.sendStatus(200);
+  if (req.user.isAdmin === true) {
+    const {
+      user: { userId },
+    } = req;
+    const { content, channelId } = req.body;
+
+    if (!content || !channelId) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json("Pls provide a message and a channelId");
+    }
+
+    let newMessage = {
+      sendedBy: userId,
+      content: content,
+      channel: channelId,
+    };
+
+    try {
+      let message = await Message.create(newMessage);
+      res.status(StatusCodes.CREATED).json({ message });
+    } catch (error) {
+      res.status(400).json("something went wrong");
+    }
   } else {
-    // Channel not found
-    res.status(404).json({ error: "Channel not found" });
+    return res
+      .status(StatusCodes.FORBIDDEN)
+      .json("You are not authorized to send messages in the BroadCastpage");
   }
 };
-
 
 module.exports = {
-    GetBroadcast,
-    CreateBroadcastPost,
+  GetBroadcast,
+  CreateBroadcastPost,
 };
-  

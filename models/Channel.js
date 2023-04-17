@@ -8,23 +8,25 @@ const ChannelSchema = new mongoose.Schema(
       trim: true,
       maxlength: [50, "Pls provide a shorter name for the chat"],
     },
-    users: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "User",
-      },
-    ],
-    latestMessage: {
-      type: mongoose.Types.ObjectId,
-      ref: "Message",
-    },
+    // users: [
+    //   {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "User",
+    //   },
+    // ],
+    // messages: [
+    //   {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "Message",
+    //   },
+    // ],
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      require: [true, "pls provide user"], //Tror inte vi behöver denna rad
     },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Channel", ChannelSchema);
+const Channel = mongoose.model("Channel", ChannelSchema);
+module.exports = Channel;

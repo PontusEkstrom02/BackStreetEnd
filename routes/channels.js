@@ -4,7 +4,7 @@ const router = express.Router();
 const {
   CreateChannel,
   GetAllChannels,
-  GetThisChannel,
+  // GetThisChannel,
   // PostInChannel,
   DeleteChannel,
 } = require("../controllers/channel");
@@ -13,7 +13,7 @@ router.route("/").put(CreateChannel).get(GetAllChannels);
 router
   .route("/:id")
   // .post(PostInChannel)
-  .delete(DeleteChannel)
-  .get(GetThisChannel);
+  .delete(DeleteChannel);
+// .get(GetThisChannel);
 
 module.exports = router;

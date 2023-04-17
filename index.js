@@ -5,13 +5,14 @@ const app = express();
 
 //connectDB
 const connectDB = require("./db/connect");
+
+//Authetication
 const authenticateUser = require("./middleware/authetication");
 
 //routers
 const authRouter = require("./routes/auth");
 const channelsRouter = require("./routes/channels.js");
 const messageRouter = require("./routes/message.js");
-const broadcastRouter = require("./routes/broadcast.js");
 
 //Errorhandler
 const notFoundMiddleware = require("./middleware/not-found");
@@ -24,8 +25,7 @@ app.use(express.json()); //säger att vi använder json i express,
 //urls
 app.use("/ducks/api/auth", authRouter);
 app.use("/ducks/api/channel", authenticateUser, channelsRouter);
-app.use("/ducks/api/channel", authenticateUser, messageRouter);
-app.use("/ducks/api/broadcast", authenticateUser, broadcastRouter);
+app.use("/ducks/api", authenticateUser, messageRouter);
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 

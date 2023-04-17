@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
 
-const { SendMessage } = require("../controllers/message");
+const { createMessage, getAllMessages, createMessageInBroadcast, getAllMessagesInBroadcast} = require("../controllers/message");
 
-router.route("/:id").post(SendMessage);
+router.route("/broadcast").get(getAllMessagesInBroadcast).post(createMessageInBroadcast);
+router.route("/channel/:id").get(getAllMessages);
+router.route("/channel/:id").post(createMessage);
 
 module.exports = router;

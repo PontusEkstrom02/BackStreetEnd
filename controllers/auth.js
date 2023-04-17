@@ -6,7 +6,9 @@ const { STATUS_CODES } = require("http");
 const register = async (req, res) => {
   const user = await User.create({ ...req.body });
   const token = user.createJWT();
-  res.status(StatusCodes.CREATED).json({ user: { name: user.name }, token });
+  res
+    .status(StatusCodes.CREATED)
+    .json({ user: { name: user.name, isAdmin: user.isAdmin }, token });
 };
 
 const login = async (req, res) => {
@@ -35,7 +37,9 @@ const login = async (req, res) => {
 
   //Kommer vi förbi if ovan vill vi skapa ett token dvs om den användaren är registrerad i vår databas.
   const token = user.createJWT();
-  res.status(StatusCodes.OK).json({ user: { name: user.name }, token });
+  res
+    .status(StatusCodes.OK)
+    .json({ user: { name: user.name, isAdmin: user.isAdmin }, token });
 };
 
 module.exports = { register, login };
