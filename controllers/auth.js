@@ -2,6 +2,7 @@ const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
 const { BadRequestError, UnauthenticatedError } = require("../errors");
 
+//registrera användare
 const register = async (req, res) => {
   const user = await User.create({ ...req.body });
   const token = user.createJWT();
@@ -10,6 +11,7 @@ const register = async (req, res) => {
     .json({ user: { name: user.name, isAdmin: user.isAdmin }, token });
 };
 
+//logga in
 const login = async (req, res) => {
   const { email, password } = req.body;
 
